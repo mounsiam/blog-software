@@ -125,3 +125,20 @@ def blog_details(request, slug):
         "liked_by": liked_by
     }
     return render(request, 'blog_details.html', context)
+
+
+@login_required(login_url='login')
+def add_reply(request, blog_id, comment_id):
+    blog = get_object_or_404(Blog, id=blog_id)
+    if request.method == "POST":
+        form = TextForm(request.POST)
+        if form.is_valid():
+            comment = get_object_or_404(Comment, id=comment_id)
+            Reply.objects.create(
+                user=request.user,
+                comment=comment,
+                text=form.cleaned_data.get('text')
+            )
+    return redirect('blog_details', slug=blog.slug)
+
+
